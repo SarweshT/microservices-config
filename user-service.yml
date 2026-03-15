@@ -1,0 +1,69 @@
+server:
+  port: 8081
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/userdb
+  application:
+    name: user-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8084/eureka/
+  instance:
+    prefer-ip-address: true
+
+feign:
+  circuitbreaker:
+    enabled: true
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      ratingService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+      hotelService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 10s
+        failureRateThreshold: 50
+        eventConsumerBufferSize: 10
+  retry:
+    instances:
+      ratingService:
+        maxAttempts: 3
+        waitDuration: 1000
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+      hotelService:
+        maxAttempts: 3
+        waitDuration: 1000
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2
+  ratelimiter:
+    instances:
+      ratingService:
+        limitForPeriod: 10
+        limitRefreshPeriod: 60s
+        timeoutDuration: 0
+      hotelService:
+        limitForPeriod: 10
+        limitRefreshPeriod: 60s
+        timeoutDuration: 0
